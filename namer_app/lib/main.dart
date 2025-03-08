@@ -32,28 +32,56 @@ class MyAppState extends ChangeNotifier {
     current = WordPair.random();
     notifyListeners();
   }
+  var favourites = <WordPair>[];
+  void toggleFavorite() {
+    if (favourites.contains(current)) {
+      favourites.remove(current);
+    } else {
+      favourites.add(current);
+    }
+    notifyListeners();
+  }
 }
+
 
 class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var pair = appState.current;
+    IconData icon;
+    if (appState.favourites.contains(pair)) {
+      icon = Icons.favorite;
+    } else {
+      icon = Icons.favorite_border;
+    }
 
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,  
-        children: [
-          Text('A random idea:'),
-          BigCard(pair: pair),
-            
-          ElevatedButton(
-            onPressed: () {
-             appState.getNext();
-            },
-            child: Text('Next'),
-          ),
-        ],
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,  
+          children: [
+           
+            BigCard(pair: pair),
+             SizedBox(height: 10),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                   appState.getNext();
+                  },
+                  child: Text('Next'),
+                ),
+                ElevatedButton.icon(onPressed: (){
+                  appState.toggleFavorite();
+                }, 
+                icon: Icon(icon),
+                label: Text('Like'))
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
